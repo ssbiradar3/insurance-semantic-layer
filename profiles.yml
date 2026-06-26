@@ -1,21 +1,41 @@
-# Local DuckDB profile. No warehouse account needed.
-# To target Snowflake later, add a 'snowflake' output block and switch target.
+# Profiles for every environment. `dev` (default) needs no warehouse account so the
+# demo runs anywhere. `prod` and `ci` target Snowflake and read ALL credentials from
+# environment variables / secrets — nothing sensitive is committed. The empty
+# defaults keep the local `dev` build from erroring when the Snowflake vars are unset.
+# See docs/PRODUCTION.md for the full company deployment.
 insurance_semantic_layer:
   target: dev
   outputs:
+    # Local, zero-cost demo warehouse. Default target so the repo runs anywhere.
     dev:
       type: duckdb
       path: "dev.duckdb"
       threads: 4
 
-    # Example Snowflake target (fill in and run with: dbt build --target prod)
-    # prod:
-    #   type: snowflake
-    #   account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
-    #   user: "{{ env_var('SNOWFLAKE_USER') }}"
-    #   password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-    #   role: TRANSFORMER
-    #   database: ANALYTICS
-    #   warehouse: TRANSFORMING
-    #   schema: dbt_insurance
-    #   threads: 8
+    # Production warehouse. Activate with: dbt build --target prod
+    # Prefer key-pair / SSO auth over a password in a real org.
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'ANALYTICS') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'insurance') }}"
+      threads: 8
+
+    # CI target: an isolated, throwaway schema per pull request so tests never
+    # touch dev or prod data. The schema name is supplied by the CI job.
+    ci:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', '') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', '') }}"
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', '') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'ANALYTICS') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING') }}"
+      schema: "{{ env_var('DBT_CI_SCHEMA', 'ci_default') }}"
+      threads: 8

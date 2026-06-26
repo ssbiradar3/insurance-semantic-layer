@@ -1,0 +1,68 @@
+version: 2
+
+# ---------------------------------------------------------------------------
+# PRODUCTION SOURCES (reference / documentation)
+#
+# In this portfolio repo the raw data is loaded from CSV `seeds/` so the project
+# runs anywhere with zero infrastructure. In a company, that same raw data already
+# lives in the warehouse, landed by an ingestion tool (Fivetran / Airbyte / CDC).
+# You declare it here as `sources` and change ONE line in each staging model:
+#
+#     from {{ ref('raw_policies') }}   ->   from {{ source('policy_admin', 'policies') }}
+#
+# Nothing downstream changes — marts, semantic models, metrics, and the
+# reconciliation tests all stay the same. See docs/PRODUCTION.md for the full
+# seeds -> sources migration.
+#
+# This file is intentionally NOT wired into the models in this repo, so the demo
+# stays seed-based and the gate stays green. It documents the production shape and
+# adds source-freshness monitoring you would turn on with `dbt source freshness`.
+# ---------------------------------------------------------------------------
+
+sources:
+  - name: policy_admin
+    description: "Policy administration system (e.g. Guidewire PolicyCenter), landed raw by ingestion."
+    database: "{{ env_var('RAW_DATABASE', 'RAW') }}"
+    schema: policy_admin
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 6, period: hour}
+      error_after: {count: 24, period: hour}
+    tables:
+      - name: policies
+        description: "One row per policy. System of record for written premium. (Stand-in: raw_policies.)"
+      - name: coverages
+        description: "Coverage parts; premiums roll up to policy written premium. (Stand-in: raw_coverages.)"
+
+  - name: claims_system
+    description: "Claims administration system (e.g. Guidewire ClaimCenter)."
+    database: "{{ env_var('RAW_DATABASE', 'RAW') }}"
+    schema: claims
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 48, period: hour}
+    tables:
+      - name: claims
+        description: "One row per claim. System of record for paid loss + case reserve. (Stand-in: raw_claims.)"
+
+  - name: reference
+    description: "Reference / master data (locations, exposures)."
+    database: "{{ env_var('RAW_DATABASE', 'RAW') }}"
+    schema: reference
+    tables:
+      - name: locations
+        description: "Insured locations / exposures. (Stand-in: raw_locations.)"
+
+  - name: vendor_catastrophe
+    description: >-
+      Third-party catastrophe / peril enrichment feed (Verisk, Moody's RMS,
+      CoreLogic). Contracted data with an SLA, so freshness is monitored.
+    database: "{{ env_var('RAW_DATABASE', 'RAW') }}"
+    schema: vendor
+    loaded_at_field: _extracted_at
+    freshness:
+      warn_after: {count: 7, period: day}   # vendor feeds often refresh weekly
+    tables:
+      - name: flood_scores
+        description: "Per-location flood zone + risk score. (Stand-in: raw_vendor_flood.)"

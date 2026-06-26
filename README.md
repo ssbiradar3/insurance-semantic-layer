@@ -96,22 +96,34 @@ mf validate-configs    # validates the semantic layer
 mf query --metrics loss_ratio,claim_frequency --group-by policy__line_of_business
 ```
 
+## Documentation
+
+- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — a one-page,
+  hiring-manager-friendly narrative (problem → solution → proof → impact).
+- [docs/PRODUCTION.md](docs/PRODUCTION.md) — how the **same project** runs inside
+  a company: warehouse swap, the `seeds` → `sources` migration, environments,
+  orchestration, CI, and governance.
+- [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) — a film-ready demo-video script +
+  submission kit.
+
 ## Targeting Snowflake later
 
-Everything is warehouse-agnostic dbt. To run on Snowflake instead of DuckDB,
-uncomment the `prod` output in `profiles.yml`, set the `SNOWFLAKE_*` environment
-variables, and run `dbt build --target prod`. The models, tests, and metrics do
-not change.
+Everything is warehouse-agnostic dbt. The `prod` and `ci` Snowflake targets are
+already defined in `profiles.yml` (credentials via `SNOWFLAKE_*` env vars). Set
+the variables and run `dbt build --target prod`. The real structural change for a
+company is `seeds` → declared `sources` (one line per staging model); see
+[docs/PRODUCTION.md](docs/PRODUCTION.md). Models, tests, and metrics do not change.
 
 ## Repo layout
 
 ```
 seeds/                raw synthetic data + vendor feed (CSV)
-models/staging/       cleaned source models + schema tests
+models/staging/       cleaned source models + schema tests + _sources.yml (prod ref)
 models/marts/         gold dim/fct models + vendor join + tests
 models/semantic/      MetricFlow semantic models, metrics, time spine
 tests/                singular reconciliation / parity tests
 scripts/              data generator + the validation gate
+docs/                 project overview, production architecture, video script
 .claude/              Claude Code hook config
 .github/workflows/    CI
 ```
