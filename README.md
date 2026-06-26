@@ -1,5 +1,17 @@
 # Insurance Semantic Layer (dbt + MetricFlow)
 
+[![dbt-ci](https://github.com/ssbiradar3/insurance-semantic-layer/actions/workflows/ci.yml/badge.svg)](https://github.com/ssbiradar3/insurance-semantic-layer/actions/workflows/ci.yml)
+![dbt](https://img.shields.io/badge/dbt-Core-FF694B?logo=dbt&logoColor=white)
+![MetricFlow](https://img.shields.io/badge/MetricFlow-semantic_layer-262A38)
+![DuckDB](https://img.shields.io/badge/DuckDB-local-FFF000?logo=duckdb&logoColor=black)
+![Snowflake-ready](https://img.shields.io/badge/Snowflake-ready-29B5E8?logo=snowflake&logoColor=white)
+
+> **Trusted by design.** Every metric is reconciled to source and gated in CI —
+> if a number drifts from the system of record, the build fails. A metric is
+> trusted because it reconciles and passes the gate, not because of who authored
+> it. New here? Start with the [Project Overview](docs/PROJECT_OVERVIEW.md), or
+> launch the [interactive dashboard](#dashboard).
+
 A trusted, self-serve semantic layer for Property and Casualty insurance, built
 on dbt and MetricFlow and running locally on DuckDB with zero warehouse cost.
 Synthetic policy, claim, and exposure data is enriched with a third-party vendor
@@ -95,6 +107,28 @@ dbt build              # builds models, runs every test incl. reconciliation
 mf validate-configs    # validates the semantic layer
 mf query --metrics loss_ratio,claim_frequency --group-by policy__line_of_business
 ```
+
+## Dashboard
+
+An interactive Streamlit dashboard where **every figure is queried live from the
+MetricFlow semantic layer** (via `mf query`) — not re-derived in the app. It's the
+"consumers" box in the architecture made real: one governed definition, rendered
+for a stakeholder.
+
+```bash
+pip install -r app/requirements.txt
+bash scripts/dashboard.sh          # builds first if needed, then opens :8501
+# or: streamlit run app/streamlit_app.py   (with DBT_PROFILES_DIR set)
+```
+
+It shows portfolio-wide loss / expense / **combined ratio** KPI cards, a combined-ratio
+breakdown by line of business or state (stacked into its loss + expense
+components), and claim frequency / severity — all sliceable from the sidebar.
+
+<!-- Add a screenshot for the portfolio: capture the running app and save it as
+docs/dashboard.png, then uncomment:
+![Dashboard](docs/dashboard.png)
+-->
 
 ## Documentation
 

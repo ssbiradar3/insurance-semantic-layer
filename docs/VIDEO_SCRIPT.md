@@ -28,8 +28,10 @@ proof → impact** arc. There's a tight **60–90s LinkedIn cut** at the bottom.
 
 **Editor / browser tabs (to flash on screen)**
 - [ ] `README.md`, `models/semantic/_metrics.yml`, `tests/assert_loss_ratio_parity.sql`
-- [ ] The GitHub repo page + the green CI check.
+- [ ] The GitHub repo page + the green CI badge.
 - [ ] `docs/PROJECT_OVERVIEW.md` for the closing.
+- [ ] **The dashboard running** in a browser tab: `pip install -r app/requirements.txt`
+      then `bash scripts/dashboard.sh` → http://localhost:8501 (this is your visual payoff).
 
 **Do a dry run once.** Aim for under 5 minutes. It's fine to edit out dead air.
 
@@ -101,7 +103,18 @@ exactly loss ratio plus expense ratio — MetricFlow composes it."*
 > concept: tie the gold fact to the source column, not a re-derivation. Trust over
 > a green checkmark."*
 
-### Scene 6 — How it scales to a company (3:45–4:25)
+### Scene 5.5 — The payoff: a stakeholder dashboard (3:45–4:15)
+**[ON SCREEN]** Switch to the browser — the Streamlit dashboard. Change the
+sidebar dimension from "Line of business" to "State"; let the charts update.
+
+*"And here's what a stakeholder actually sees. This dashboard isn't running its
+own SQL — every number is queried live from the same MetricFlow semantic layer.
+So the combined ratio here is, by construction, the exact same governed,
+reconciled number from the build. I can slice it by line of business or by state,
+and loss versus expense are stacked so you can see what's driving it. One
+definition, from raw data all the way to the executive view."*
+
+### Scene 6 — How it scales to a company (4:15–4:50)
 **[ON SCREEN]** Flash `docs/PRODUCTION.md` mapping table, then `profiles.yml` prod target.
 
 *"This runs locally on DuckDB with zero setup, but it's warehouse-agnostic. In a
@@ -110,7 +123,7 @@ instead of CSV seeds — that's a one-line change per model — and wrap it in
 ingestion, orchestration, and CI against the warehouse. The models, metrics, and
 trust tests transfer as-is. I documented that whole migration."*
 
-### Scene 7 — Close & call to action (4:25–4:50)
+### Scene 7 — Close & call to action (4:50–5:15)
 **[ON SCREEN]** Webcam. Then GitHub repo with the green CI badge.
 
 *"So that's a trusted, self-serve insurance semantic layer — modeling, metrics
