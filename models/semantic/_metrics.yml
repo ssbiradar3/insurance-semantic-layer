@@ -1,0 +1,61 @@
+metrics:
+  # ---- simple metrics (one measure each) ----
+  - name: written_premium
+    description: "Total written premium."
+    type: simple
+    label: "Written Premium"
+    type_params:
+      measure: written_premium_amount
+
+  - name: earned_premium
+    description: "Total earned premium."
+    type: simple
+    label: "Earned Premium"
+    type_params:
+      measure: earned_premium_amount
+
+  - name: incurred_loss
+    description: "Total incurred loss (paid + reserve)."
+    type: simple
+    label: "Incurred Loss"
+    type_params:
+      measure: incurred_loss_amount
+
+  - name: claim_count
+    description: "Number of claims."
+    type: simple
+    label: "Claim Count"
+    type_params:
+      measure: claim_count
+
+  - name: policy_count
+    description: "Number of policies."
+    type: simple
+    label: "Policy Count"
+    type_params:
+      measure: policy_count
+
+  # ---- ratio metrics (the governed KPIs stakeholders self-serve) ----
+  - name: loss_ratio
+    description: "Incurred loss divided by earned premium. The headline KPI."
+    type: ratio
+    label: "Loss Ratio"
+    type_params:
+      numerator: incurred_loss
+      denominator: earned_premium
+
+  - name: claim_frequency
+    description: "Claims per policy."
+    type: ratio
+    label: "Claim Frequency"
+    type_params:
+      numerator: claim_count
+      denominator: policy_count
+
+  - name: claim_severity
+    description: "Average incurred loss per claim."
+    type: ratio
+    label: "Claim Severity"
+    type_params:
+      numerator: incurred_loss
+      denominator: claim_count

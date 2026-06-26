@@ -1,0 +1,21 @@
+# Local DuckDB profile. No warehouse account needed.
+# To target Snowflake later, add a 'snowflake' output block and switch target.
+insurance_semantic_layer:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "dev.duckdb"
+      threads: 4
+
+    # Example Snowflake target (fill in and run with: dbt build --target prod)
+    # prod:
+    #   type: snowflake
+    #   account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+    #   user: "{{ env_var('SNOWFLAKE_USER') }}"
+    #   password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+    #   role: TRANSFORMER
+    #   database: ANALYTICS
+    #   warehouse: TRANSFORMING
+    #   schema: dbt_insurance
+    #   threads: 8

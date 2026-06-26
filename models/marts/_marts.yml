@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: dim_policy
+    columns:
+      - name: policy_id
+        tests: [unique, not_null]
+
+  - name: dim_location
+    description: "Exposure dimension after the vendor flood join."
+    columns:
+      - name: location_id
+        tests: [unique, not_null]
+      - name: flood_zone
+        description: "From the vendor feed; UNKNOWN if the feed had no match."
+        tests:
+          - accepted_values:
+              values: ['X', 'A', 'AE', 'VE', 'UNKNOWN']
+
+  - name: fct_premium
+    description: "One row per policy with written and earned premium."
+    tests:
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: written_premium
+          column_B: earned_premium
+          or_equal: true
+    columns:
+      - name: policy_id
+        tests: [unique, not_null]
+      - name: earned_premium
+        tests: [not_null]
+
+  - name: fct_claim
+    description: "One row per claim, enriched with policy attributes."
+    columns:
+      - name: claim_id
+        tests: [unique, not_null]
+      - name: policy_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_policy')
+              field: policy_id
+      - name: incurred_loss
+        tests: [not_null]

@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: stg_policies
+    description: "Cleaned policy records, one row per policy."
+    columns:
+      - name: policy_id
+        description: "Primary key."
+        tests: [unique, not_null]
+      - name: written_premium
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
+      - name: line_of_business
+        tests:
+          - accepted_values:
+              values: ['Property', 'Casualty', 'Marine', 'Cyber']
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['Active', 'Cancelled', 'Expired']
+      - name: location_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_locations')
+              field: location_id
+
+  - name: stg_coverages
+    description: "Coverage parts. Premiums roll up to the policy written premium."
+    columns:
+      - name: coverage_id
+        tests: [unique, not_null]
+      - name: policy_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_policies')
+              field: policy_id
+      - name: coverage_premium
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 200000
+
+  - name: stg_claims
+    description: "Cleaned claims with incurred loss derived."
+    columns:
+      - name: claim_id
+        tests: [unique, not_null]
+      - name: policy_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_policies')
+              field: policy_id
+      - name: claim_status
+        tests:
+          - accepted_values:
+              values: ['Open', 'Closed']
+      - name: incurred_loss
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 500000
+
+  - name: stg_locations
+    columns:
+      - name: location_id
+        tests: [unique, not_null]
+
+  - name: stg_vendor_flood
+    description: "Third-party flood enrichment feed (vendor stand-in)."
+    columns:
+      - name: location_id
+        tests: [unique, not_null]
+      - name: flood_zone
+        tests:
+          - accepted_values:
+              values: ['X', 'A', 'AE', 'VE']
+      - name: flood_risk_score
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 100

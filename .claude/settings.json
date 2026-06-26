@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "case \"$CLAUDE_FILE_PATH\" in *models/*.sql|*models/*.yml|*tests/*.sql) echo '[hook] model/metric changed -> running gate'; bash scripts/validate.sh ;; *) : ;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}

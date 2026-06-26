@@ -1,0 +1,76 @@
+semantic_models:
+  # ---------------------------------------------------------------- premium
+  - name: sem_premium
+    description: "Premium facts at policy grain."
+    model: ref('fct_premium')
+    defaults:
+      agg_time_dimension: effective_date
+    entities:
+      - name: policy
+        type: primary
+        expr: policy_id
+      - name: location
+        type: foreign
+        expr: location_id
+    dimensions:
+      - name: state
+        type: categorical
+      - name: line_of_business
+        type: categorical
+      - name: effective_date
+        type: time
+        type_params:
+          time_granularity: day
+    measures:
+      - name: written_premium_amount
+        description: "Total written premium."
+        agg: sum
+        expr: written_premium
+      - name: earned_premium_amount
+        description: "Total earned premium as of the snapshot date."
+        agg: sum
+        expr: earned_premium
+      - name: policy_count
+        description: "Count of policies."
+        agg: count_distinct
+        expr: policy_id
+
+  # ----------------------------------------------------------------- claim
+  - name: sem_claim
+    description: "Claim facts at claim grain."
+    model: ref('fct_claim')
+    defaults:
+      agg_time_dimension: loss_date
+    entities:
+      - name: claim
+        type: primary
+        expr: claim_id
+      - name: policy
+        type: foreign
+        expr: policy_id
+      - name: location
+        type: foreign
+        expr: location_id
+    dimensions:
+      - name: state
+        type: categorical
+      - name: line_of_business
+        type: categorical
+      - name: peril
+        type: categorical
+      - name: loss_date
+        type: time
+        type_params:
+          time_granularity: day
+    measures:
+      - name: incurred_loss_amount
+        description: "Paid loss plus case reserve."
+        agg: sum
+        expr: incurred_loss
+      - name: paid_loss_amount
+        agg: sum
+        expr: paid_loss
+      - name: claim_count
+        description: "Number of claims."
+        agg: count
+        expr: claim_id
