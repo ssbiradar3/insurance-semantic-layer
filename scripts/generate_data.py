@@ -30,6 +30,12 @@ COVERAGE_TYPES = {
     "Cyber": ["DataBreach", "BusinessInterruption"],
 }
 
+# Underwriting expense as a fraction of written premium, by line of business
+# (commission + general expense). Applied deterministically with NO random draw,
+# so existing policy / coverage / claim data stays byte-identical. This is the
+# source basis for the expense_ratio and combined_ratio metrics.
+EXPENSE_RATE = {"Property": 0.28, "Casualty": 0.30, "Marine": 0.26, "Cyber": 0.34}
+
 N_LOCATIONS = 60
 N_POLICIES = 600
 
@@ -98,16 +104,18 @@ for pol_id in range(1, N_POLICIES + 1):
         pol_cov_rows.append([cov_id, pol_id, ct, limit, prem])
         cov_id += 1
     pol_written = round(pol_written, 2)
+    underwriting_expense = round(pol_written * EXPENSE_RATE[lob], 2)
     status = random.choices(["Active", "Cancelled", "Expired"], weights=[70, 8, 22])[0]
     policies.append([
         pol_id, f"POL-{pol_id:05d}", lob, eff.isoformat(), exp.isoformat(),
-        loc[3], loc[0], pol_written, status,
+        loc[3], loc[0], pol_written, underwriting_expense, status,
     ])
     coverages.extend(pol_cov_rows)
 
 write_csv("raw_policies.csv",
           ["policy_id", "policy_number", "line_of_business", "effective_date",
-           "expiration_date", "state", "location_id", "written_premium", "status"],
+           "expiration_date", "state", "location_id", "written_premium",
+           "underwriting_expense", "status"],
           policies)
 write_csv("raw_coverages.csv",
           ["coverage_id", "policy_id", "coverage_type", "coverage_limit",

@@ -10,5 +10,6 @@ select
     state,
     location_id,
     cast(written_premium as double) as written_premium,
+    cast(underwriting_expense as double) as underwriting_expense,
     status
 from source

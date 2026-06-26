@@ -6,3 +6,5 @@ logs/
 .user.yml
 __pycache__/
 .DS_Store
+.venv/
+venv/

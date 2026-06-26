@@ -35,6 +35,13 @@ metrics:
     type_params:
       measure: policy_count
 
+  - name: underwriting_expense
+    description: "Total underwriting expense (commission + general expense)."
+    type: simple
+    label: "Underwriting Expense"
+    type_params:
+      measure: underwriting_expense_amount
+
   # ---- ratio metrics (the governed KPIs stakeholders self-serve) ----
   - name: loss_ratio
     description: "Incurred loss divided by earned premium. The headline KPI."
@@ -59,3 +66,24 @@ metrics:
     type_params:
       numerator: incurred_loss
       denominator: claim_count
+
+  - name: expense_ratio
+    description: "Underwriting expense divided by written premium (trade basis)."
+    type: ratio
+    label: "Expense Ratio"
+    type_params:
+      numerator: underwriting_expense
+      denominator: written_premium
+
+  # ---- derived metric (combines other governed metrics) ----
+  - name: combined_ratio
+    description: >-
+      Loss ratio plus expense ratio. The headline underwriting-profitability KPI:
+      below 1.0 means the book made an underwriting profit, above 1.0 a loss.
+    type: derived
+    label: "Combined Ratio"
+    type_params:
+      expr: loss_ratio + expense_ratio
+      metrics:
+        - name: loss_ratio
+        - name: expense_ratio

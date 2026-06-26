@@ -49,11 +49,16 @@ proves no exposure is silently dropped or left unmatched.
 
 Defined once in `models/semantic/_metrics.yml`, queryable everywhere:
 
-- Simple: `written_premium`, `earned_premium`, `incurred_loss`, `claim_count`, `policy_count`
-- Ratio: `loss_ratio`, `claim_frequency`, `claim_severity`
+- Simple: `written_premium`, `earned_premium`, `incurred_loss`, `underwriting_expense`, `claim_count`, `policy_count`
+- Ratio: `loss_ratio`, `expense_ratio`, `claim_frequency`, `claim_severity`
+- Derived: `combined_ratio` (`loss_ratio + expense_ratio`) — the headline
+  underwriting-profitability KPI; below 1.0 is an underwriting profit.
 
 `loss_ratio` spans two semantic models (loss from claims, premium from policies)
 and MetricFlow builds the join automatically through the shared `policy` entity.
+`combined_ratio` is a derived metric composed from `loss_ratio` and
+`expense_ratio`, and every one of these reconciles to source (see the
+`assert_*` tests).
 
 ## How trust is enforced
 

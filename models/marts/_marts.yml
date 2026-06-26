@@ -29,6 +29,8 @@ models:
         tests: [unique, not_null]
       - name: earned_premium
         tests: [not_null]
+      - name: underwriting_expense
+        tests: [not_null]
 
   - name: fct_claim
     description: "One row per claim, enriched with policy attributes."

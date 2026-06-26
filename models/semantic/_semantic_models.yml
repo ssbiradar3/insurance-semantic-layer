@@ -30,6 +30,10 @@ semantic_models:
         description: "Total earned premium as of the snapshot date."
         agg: sum
         expr: earned_premium
+      - name: underwriting_expense_amount
+        description: "Total underwriting expense (commission + general expense)."
+        agg: sum
+        expr: underwriting_expense
       - name: policy_count
         description: "Count of policies."
         agg: count_distinct

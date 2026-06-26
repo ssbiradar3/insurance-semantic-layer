@@ -13,6 +13,13 @@ models:
           - dbt_expectations.expect_column_values_to_be_between:
               min_value: 0
               max_value: 1000000
+      - name: underwriting_expense
+        description: "Underwriting expense; source basis for the expense ratio."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1000000
       - name: line_of_business
         tests:
           - accepted_values:

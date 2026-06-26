@@ -17,6 +17,7 @@ earned as (
         pol.effective_date,
         pol.expiration_date,
         pol.written_premium,
+        pol.underwriting_expense,
         greatest(0.0, least(1.0,
             date_diff('day', pol.effective_date,
                       least(s.as_of, pol.expiration_date))
@@ -32,5 +33,6 @@ select
     location_id,
     effective_date,
     written_premium,
+    underwriting_expense,
     round(written_premium * earned_fraction, 2) as earned_premium
 from earned
