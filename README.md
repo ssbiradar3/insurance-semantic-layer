@@ -23,6 +23,22 @@ The goal of this repo is not just to define metrics. It is to make them
 business and know the number ties back to the raw source, because a
 reconciliation test proves it on every build.
 
+### Built across three lenses
+
+This project shows the full arc of owning a data product — framing it, building
+it to last, and using it to answer a question:
+
+- 🧭 **Product** — a real problem (untrusted KPIs → bad pricing/reserving
+  decisions) shipped as a governed, self-serve product with users, success
+  metrics, and a roadmap.
+- 🛠️ **Engineering** — `staging → marts → semantic` dbt modeling, **incremental**
+  facts + **SCD2** history, reconciliation-to-source tests, unit tests, and CI.
+- 📊 **Analytics** — P&C fluency, used to produce an actual insight (which book
+  and which states drive the combined ratio).
+
+See [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) for the three-lens
+write-up, the product thinking, and the analyst's read.
+
 ## Architecture
 
 ```
@@ -204,10 +220,11 @@ seeds/                raw synthetic data + vendor feed (CSV)
 models/staging/       cleaned source models + schema tests + _sources.yml (prod ref)
 models/marts/         gold dim/incremental-fct models + vendor join + tests
 models/semantic/      MetricFlow semantic models, metrics, time spine
+snapshots/            SCD2 policy-status history
 tests/                singular reconciliation / parity tests
 app/                  Streamlit dashboard (queries the semantic layer live)
-scripts/              data generator, refresh simulator, validation gate
-docs/                 project overview, production architecture, video script
+scripts/              data generator, refresh simulator, docs + validation gate
+docs/                 overview, production, observability, video script
 .claude/              Claude Code hook config
 .github/workflows/    CI + scheduled incremental refresh
 ```
