@@ -68,8 +68,9 @@ def main():
     batch_ts = last_load + timedelta(days=1)
     batch_str = batch_ts.isoformat(sep=" ")
 
-    # Deterministic per batch date, and distinct from the base load (seed=42).
-    random.seed(int(batch_ts.timestamp()))
+    # Deterministic per batch date (timezone-independent), distinct from the base
+    # load (seed=42), so the same batch date yields the same rows on any machine.
+    random.seed(int(batch_ts.strftime("%Y%m%d")))
 
     locations = [(int(r[0]), r[3]) for r in loc_rows]  # (location_id, state)
 
