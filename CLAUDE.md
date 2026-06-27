@@ -22,6 +22,14 @@ Common commands:
 - `mf validate-configs` validate the semantic layer
 - `mf query --metrics loss_ratio --group-by policy__line_of_business`
 - `bash scripts/validate.sh` the full gate (build + tests + semantic validation)
+- `python scripts/simulate_refresh.py && dbt build` simulate the next ingestion
+  batch; the incremental facts process only the new rows
+
+Refresh / incrementality:
+- `fct_premium` and `fct_claim` are incremental, keyed on their PK with a
+  `loaded_at` watermark. After ANY change to their schema, rebuild with
+  `dbt build --full-refresh` (an in-place incremental run against an old table
+  shape will fail). CI always builds clean, so it is unaffected.
 
 ## Conventions (do not break these)
 1. MetricFlow has ONE GLOBAL NAMESPACE. Every entity, dimension, measure, and

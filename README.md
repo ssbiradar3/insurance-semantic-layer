@@ -88,6 +88,44 @@ and MetricFlow builds the join automatically through the shared `policy` entity.
 A metric is trusted because it reconciles and passes the gate, not because of who
 or what authored it.
 
+## Data quality checks
+
+Tests run at every layer and all execute in `dbt build` / CI:
+
+- **Keys & integrity** — `unique` + `not_null` on every primary key; `relationships`
+  (foreign-key) tests from facts to dimensions.
+- **Domain validity** — `accepted_values` on enums (line of business, status, flood
+  zone, claim status) and `dbt_expectations` range checks on amounts and scores.
+- **Cross-column logic** — e.g. `written_premium >= earned_premium`.
+- **Vendor-join integrity** — proves the third-party feed neither drops nor fans
+  out exposures.
+- **Reconciliation to source** — five singular `assert_*` tests tie gold metrics
+  back to the raw source of record (the differentiator most demos lack).
+- **Semantic validation** — `mf validate-configs` checks every metric resolves.
+
+## Data refresh (incremental)
+
+The fact tables are **incremental**: on a refresh, only rows from a newer
+ingestion batch are processed, keyed off a `loaded_at` watermark.
+
+```bash
+python scripts/simulate_refresh.py   # appends the next dated batch to the seeds
+dbt build                            # incremental: only the new batch is processed
+```
+
+- `fct_premium` / `fct_claim` use `materialized='incremental'` with a
+  `unique_key` and a `where loaded_at > max(loaded_at)` filter.
+- [`scripts/simulate_refresh.py`](scripts/simulate_refresh.py) appends a new dated
+  batch (internally consistent, so reconciliation still ties out).
+- [`.github/workflows/scheduled-refresh.yml`](.github/workflows/scheduled-refresh.yml)
+  runs daily: initial load → simulate a batch → incremental rebuild → full
+  reconciliation gate. It proves a scheduled refresh keeps trust green.
+- A full rebuild is `dbt build --full-refresh`.
+
+In production this same pattern runs against the warehouse on an orchestrator
+(Airflow / Dagster / dbt Cloud) with `dbt source freshness` on the ingested
+tables — see [docs/PRODUCTION.md](docs/PRODUCTION.md).
+
 ## Claude Code automation
 
 - `CLAUDE.md` is the project constitution Claude reads each session.
@@ -153,11 +191,12 @@ company is `seeds` → declared `sources` (one line per staging model); see
 ```
 seeds/                raw synthetic data + vendor feed (CSV)
 models/staging/       cleaned source models + schema tests + _sources.yml (prod ref)
-models/marts/         gold dim/fct models + vendor join + tests
+models/marts/         gold dim/incremental-fct models + vendor join + tests
 models/semantic/      MetricFlow semantic models, metrics, time spine
 tests/                singular reconciliation / parity tests
-scripts/              data generator + the validation gate
+app/                  Streamlit dashboard (queries the semantic layer live)
+scripts/              data generator, refresh simulator, validation gate
 docs/                 project overview, production architecture, video script
 .claude/              Claude Code hook config
-.github/workflows/    CI
+.github/workflows/    CI + scheduled incremental refresh
 ```

@@ -31,6 +31,9 @@ models:
         tests: [not_null]
       - name: underwriting_expense
         tests: [not_null]
+      - name: loaded_at
+        description: "Ingestion-batch watermark used by the incremental build."
+        tests: [not_null]
 
   - name: fct_claim
     description: "One row per claim, enriched with policy attributes."
@@ -44,4 +47,7 @@ models:
               to: ref('dim_policy')
               field: policy_id
       - name: incurred_loss
+        tests: [not_null]
+      - name: loaded_at
+        description: "Ingestion-batch watermark used by the incremental build."
         tests: [not_null]

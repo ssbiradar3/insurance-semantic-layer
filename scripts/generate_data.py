@@ -36,6 +36,12 @@ COVERAGE_TYPES = {
 # source basis for the expense_ratio and combined_ratio metrics.
 EXPENSE_RATE = {"Property": 0.28, "Casualty": 0.30, "Marine": 0.26, "Cyber": 0.34}
 
+# Ingestion timestamp stamped on every row of the initial load. Real warehouses
+# carry a "loaded_at" so downstream models can process only new rows. The
+# incremental facts (fct_premium, fct_claim) use it as their watermark, and
+# scripts/simulate_refresh.py appends later batches with a newer timestamp.
+INITIAL_LOAD_TS = "2026-06-01 00:00:00"
+
 N_LOCATIONS = 60
 N_POLICIES = 600
 
@@ -108,14 +114,14 @@ for pol_id in range(1, N_POLICIES + 1):
     status = random.choices(["Active", "Cancelled", "Expired"], weights=[70, 8, 22])[0]
     policies.append([
         pol_id, f"POL-{pol_id:05d}", lob, eff.isoformat(), exp.isoformat(),
-        loc[3], loc[0], pol_written, underwriting_expense, status,
+        loc[3], loc[0], pol_written, underwriting_expense, status, INITIAL_LOAD_TS,
     ])
     coverages.extend(pol_cov_rows)
 
 write_csv("raw_policies.csv",
           ["policy_id", "policy_number", "line_of_business", "effective_date",
            "expiration_date", "state", "location_id", "written_premium",
-           "underwriting_expense", "status"],
+           "underwriting_expense", "status", "loaded_at"],
           policies)
 write_csv("raw_coverages.csv",
           ["coverage_id", "policy_id", "coverage_type", "coverage_limit",
@@ -140,13 +146,13 @@ for pol in policies:
                 reserve = 0.0
             claims.append([
                 claim_id, pol_id, loss.isoformat(), report.isoformat(),
-                cstatus, paid, reserve, random.choice(PERILS),
+                cstatus, paid, reserve, random.choice(PERILS), INITIAL_LOAD_TS,
             ])
             claim_id += 1
 
 write_csv("raw_claims.csv",
           ["claim_id", "policy_id", "loss_date", "report_date", "claim_status",
-           "paid_loss", "case_reserve", "peril"],
+           "paid_loss", "case_reserve", "peril", "loaded_at"],
           claims)
 
 print("\nDone. Seed totals:")

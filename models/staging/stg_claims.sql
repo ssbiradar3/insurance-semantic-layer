@@ -10,5 +10,6 @@ select
     cast(paid_loss as double)    as paid_loss,
     cast(case_reserve as double) as case_reserve,
     cast(paid_loss as double) + cast(case_reserve as double) as incurred_loss,
-    peril
+    peril,
+    cast(loaded_at as timestamp) as loaded_at
 from source

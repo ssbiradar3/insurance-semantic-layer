@@ -11,5 +11,6 @@ select
     location_id,
     cast(written_premium as double) as written_premium,
     cast(underwriting_expense as double) as underwriting_expense,
-    status
+    status,
+    cast(loaded_at as timestamp) as loaded_at
 from source

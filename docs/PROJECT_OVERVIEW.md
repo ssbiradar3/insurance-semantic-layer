@@ -93,7 +93,8 @@ Cyber                  3.36258            0.34          3.70258
 ## What this demonstrates
 
 - **Analytics / data engineering** — dimensional modeling, dbt project structure,
-  staging→marts→semantic layering, incremental-ready facts.
+  staging→marts→semantic layering, and **incremental fact tables** with a
+  `loaded_at` watermark plus a simulated daily refresh and a scheduled CI job.
 - **Semantic layer & metrics governance** — MetricFlow entities, measures, ratio
   and derived metrics, one global namespace.
 - **Data quality & trust** — generic tests, `dbt_expectations`, and a
