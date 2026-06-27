@@ -24,6 +24,12 @@ models:
           column_A: written_premium
           column_B: earned_premium
           or_equal: true
+      # Volume monitor: alerts if the table size falls outside an expected band
+      # (a pipeline that drops or fans out rows). The native equivalent of an
+      # Elementary volume-anomaly test, runnable on DuckDB.
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 500
+          max_value: 5000000
     columns:
       - name: policy_id
         tests: [unique, not_null]
@@ -37,6 +43,11 @@ models:
 
   - name: fct_claim
     description: "One row per claim, enriched with policy attributes."
+    tests:
+      # Volume monitor for the claims fact (see fct_premium for rationale).
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          min_value: 100
+          max_value: 5000000
     columns:
       - name: claim_id
         tests: [unique, not_null]

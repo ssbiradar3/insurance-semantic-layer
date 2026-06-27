@@ -101,7 +101,16 @@ Tests run at every layer and all execute in `dbt build` / CI:
   out exposures.
 - **Reconciliation to source** — five singular `assert_*` tests tie gold metrics
   back to the raw source of record (the differentiator most demos lack).
+- **Volume monitors** — `dbt_expectations.expect_table_row_count_to_be_between` on
+  the facts (the native equivalent of an anomaly/volume test).
+- **Logic regression** — a dbt **unit test** pins the earned-premium proration math.
+- **Change history** — an SCD2 snapshot (`policy_status_snapshot`) tracks status
+  changes over time (`dbt_valid_from` / `dbt_valid_to`).
 - **Semantic validation** — `mf validate-configs` checks every metric resolves.
+
+Observability: `bash scripts/docs.sh` generates an interactive lineage + catalog
+report (DuckDB-compatible). See [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) for
+the monitoring approach and why Elementary is the production (non-DuckDB) upgrade.
 
 ## Data refresh (incremental)
 
@@ -175,6 +184,8 @@ docs/dashboard.png, then uncomment:
 - [docs/PRODUCTION.md](docs/PRODUCTION.md) — how the **same project** runs inside
   a company: warehouse swap, the `seeds` → `sources` migration, environments,
   orchestration, CI, and governance.
+- [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) — monitoring approach (volume
+  anomalies, the `dbt docs` report) and the Elementary production path.
 - [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) — a film-ready demo-video script +
   submission kit.
 

@@ -90,29 +90,76 @@ Cyber                  3.36258            0.34          3.70258
 > the *concept*: a reconciliation should tie the gold fact to the source-of-record
 > column (sum-to-sum), not re-implement the math in a different engine.
 
-## What this demonstrates
+## What this demonstrates — three lenses
 
-- **Analytics / data engineering** — dimensional modeling, dbt project structure,
-  staging→marts→semantic layering, and **incremental fact tables** with a
-  `loaded_at` watermark plus a simulated daily refresh and a scheduled CI job.
-- **Semantic layer & metrics governance** — MetricFlow entities, measures, ratio
-  and derived metrics, one global namespace.
-- **Data quality & trust** — generic tests, `dbt_expectations`, and a
-  reconciliation-to-source pattern most demos skip entirely.
-- **Engineering discipline** — CI gate, a pre-edit hook that runs the gate
-  automatically, warehouse-agnostic config, clean git history.
-- **Domain fluency** — P&C metrics (loss ratio, combined ratio, claim frequency /
-  severity), vendor catastrophe enrichment, actuarial reconciliation.
+I built this to show the full arc of owning a data product: framing the problem
+(**product**), building it to last (**engineering**), and using it to answer a
+question (**analytics**).
+
+**Data product manager**
+- Frames a real, expensive problem (untrusted metrics → bad pricing/reserving
+  decisions) and ships a *product*: governed, self-serve KPIs with trust built in.
+- Defines users, the job-to-be-done, success metrics, and a roadmap — see
+  [Product thinking](#product-thinking-pm-lens) below.
+- Makes explicit trade-offs (e.g. native volume monitors vs. Elementary on a
+  zero-infra engine — see [OBSERVABILITY.md](OBSERVABILITY.md)).
+
+**Analytics engineer / data engineer**
+- Dimensional modeling and a clean `staging → marts → semantic` structure.
+- **Incremental** fact tables with a `loaded_at` watermark, a simulated daily
+  refresh, and a scheduled CI job; **SCD2 snapshot** for changing dimensions.
+- Trust enforced: schema tests, `dbt_expectations` (incl. volume monitors), a
+  **dbt unit test** of the proration logic, and the reconciliation-to-source
+  pattern most demos skip — all gated in CI.
+
+**Data analyst**
+- Speaks P&C fluently (loss ratio, combined ratio, claim frequency / severity)
+  and uses the layer to produce an actual insight — see
+  [An analyst's read](#an-analysts-read-analyst-lens).
+
+## Product thinking (PM lens)
+
+- **Users / customers:** actuaries and pricing analysts (need numbers that tie to
+  the system of record), underwriting & finance leaders (combined ratio by book),
+  and BI developers (one definition to build on).
+- **Job to be done:** "Let me self-serve a trusted KPI by state or line of
+  business without rebuilding it in a spreadsheet or doubting the number."
+- **Success metrics:** metric reuse / adoption (one definition consumed by N
+  surfaces), time-to-insight (self-serve vs. a ticket to the data team), and
+  *trust* (zero reconciliation breaches reaching a dashboard).
+- **Roadmap (prioritized):** ① retention/renewal & `policies_in_force` metrics →
+  ② row/column-level access for PII → ③ Elementary anomaly detection on a real
+  warehouse → ④ a natural-language query surface over the semantic layer.
+
+## An analyst's read (analyst lens)
+
+Querying the layer (synthetic data — read the *relative* story, not the absolute
+levels, which are deliberately loss-heavy):
+
+- **Marine is the most profitable book** (combined ratio 2.34) — it has the
+  *lowest* claim frequency (0.56) and the *lowest* expense load (26%).
+- **Cyber is the worst** (3.70) — a *double* problem: the highest loss ratio
+  (3.36) **and** the highest expense load (34%). Expense discipline alone won't
+  fix it; it's a loss-cost issue.
+- **Property** carries the highest claim **frequency** (0.77) and **severity**
+  (~138k) — frequency and severity are both elevated, a classic cat-exposed book.
+- **Geography:** California is the most profitable state (2.08); Colorado and
+  Florida are the weakest (3.92 / 3.69) — consistent with catastrophe exposure.
+- **So what:** the combined-ratio decomposition points underwriting at *Cyber
+  loss cost* and *CO/FL cat exposure* first — that's the action the metric layer
+  is built to enable.
 
 ## Tech stack
 
 | Layer | Tool |
 |---|---|
-| Transform | dbt Core |
+| Transform | dbt Core (incl. incremental models + SCD2 snapshot) |
 | Warehouse | DuckDB locally · warehouse-agnostic (Snowflake-ready) |
 | Semantic layer | MetricFlow |
-| Testing | dbt generic tests · dbt_expectations · singular reconciliation tests |
-| CI | GitHub Actions |
+| Testing | dbt generic tests · dbt_expectations (incl. volume monitors) · dbt unit tests · singular reconciliation tests |
+| Observability | `dbt docs` lineage/catalog report (Elementary in production) |
+| BI / consumer | Streamlit dashboard querying the semantic layer live |
+| CI | GitHub Actions (gate on push + scheduled incremental refresh) |
 | Automation | Claude Code PostToolUse hook runs the gate on every model edit |
 
 ## Run it in ~90 seconds

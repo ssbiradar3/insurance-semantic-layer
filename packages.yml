@@ -3,3 +3,11 @@ packages:
     version: [">=1.1.0", "<2.0.0"]
   - package: calogica/dbt_expectations
     version: [">=0.10.0", "<0.11.0"]
+
+  # Production observability: Elementary adds anomaly/volume/freshness monitors
+  # and an HTML report. It does NOT support DuckDB (this repo's zero-infra engine),
+  # so the demo uses native dbt_expectations volume monitors + `dbt docs` for the
+  # report instead. On a real warehouse (Snowflake/BigQuery), enable it here:
+  # - package: elementary-data/elementary
+  #   version: [">=0.16.0", "<0.20.0"]
+  # See docs/OBSERVABILITY.md.
