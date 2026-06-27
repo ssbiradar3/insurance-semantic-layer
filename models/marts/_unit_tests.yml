@@ -1,0 +1,30 @@
+version: 2
+
+# Unit tests exercise the MODEL LOGIC (not the data): given fixed mock inputs,
+# assert the transformation produces the expected output. Here we pin the
+# earned-premium proration in fct_premium against the 2026-06-30 snapshot date.
+unit_tests:
+  - name: earned_premium_proration
+    description: >-
+      fct_premium pro-rates written premium by the fraction of the term elapsed
+      at the 2026-06-30 snapshot: fully earned -> full premium; not yet started
+      -> zero; mid-term -> the prorated share.
+    model: fct_premium
+    # fct_premium is incremental; unit-test the full transformation path.
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: ref('stg_policies')
+        rows:
+          # Term ended before the snapshot -> fully earned (fraction = 1).
+          - {policy_id: 1, line_of_business: 'Property', state: 'CA', location_id: 1, written_premium: 1000.0, underwriting_expense: 280.0, effective_date: '2024-06-30', expiration_date: '2025-06-30', loaded_at: '2026-06-01 00:00:00'}
+          # Effective after the snapshot -> not yet earned (fraction = 0).
+          - {policy_id: 2, line_of_business: 'Cyber', state: 'NY', location_id: 2, written_premium: 1000.0, underwriting_expense: 340.0, effective_date: '2026-12-01', expiration_date: '2027-12-01', loaded_at: '2026-06-01 00:00:00'}
+          # Mid-term: 2026-01-01 .. 2027-01-01, snapshot 2026-06-30 -> 180/365.
+          - {policy_id: 3, line_of_business: 'Marine', state: 'TX', location_id: 3, written_premium: 1000.0, underwriting_expense: 260.0, effective_date: '2026-01-01', expiration_date: '2027-01-01', loaded_at: '2026-06-01 00:00:00'}
+    expect:
+      rows:
+        - {policy_id: 1, earned_premium: 1000.0}
+        - {policy_id: 2, earned_premium: 0.0}
+        - {policy_id: 3, earned_premium: 493.15}

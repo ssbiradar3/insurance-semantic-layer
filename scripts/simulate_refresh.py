@@ -48,9 +48,18 @@ def append_rows(name, rows):
         csv.writer(f).writerows(rows)
 
 
+def write_full(name, header, rows):
+    with open(os.path.join(SEEDS, name), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(header)
+        w.writerows(rows)
+
+
 def main():
     ap = argparse.ArgumentParser(description="Append a simulated daily ingestion batch.")
     ap.add_argument("--policies", type=int, default=25, help="new policies to add")
+    ap.add_argument("--cancellations", type=int, default=5,
+                    help="existing Active policies to cancel (drives SCD2 history)")
     args = ap.parse_args()
 
     pol_header, pol_rows = read_csv("raw_policies.csv")
@@ -114,13 +123,26 @@ def main():
                 ])
                 next_clm += 1
 
-    append_rows("raw_policies.csv", new_pol)
+    # Status changes: cancel a few existing Active policies, stamping this batch's
+    # loaded_at. The SCD2 snapshot records the Active -> Cancelled transition;
+    # the incremental fact re-processes the touched rows (status is not a fact
+    # column, so reconciliation is unaffected).
+    active_idx = [i for i, r in enumerate(pol_rows) if r[col["status"]] == "Active"]
+    cancel_idx = random.sample(active_idx, min(args.cancellations, len(active_idx)))
+    for i in cancel_idx:
+        pol_rows[i][col["status"]] = "Cancelled"
+        pol_rows[i][col["loaded_at"]] = batch_str
+
+    # Existing policies (some now cancelled) are rewritten; new rows appended.
+    write_full("raw_policies.csv", pol_header, pol_rows + new_pol)
     append_rows("raw_coverages.csv", new_cov)
     append_rows("raw_claims.csv", new_clm)
 
     print(f"Appended ingestion batch  loaded_at = {batch_str}")
-    print(f"  policies +{len(new_pol)}   coverages +{len(new_cov)}   claims +{len(new_clm)}")
-    print("Next: `dbt build` — the incremental facts will process only this batch.")
+    print(f"  policies +{len(new_pol)}   coverages +{len(new_cov)}   "
+          f"claims +{len(new_clm)}   cancellations {len(cancel_idx)}")
+    print("Next: `dbt build` — incremental facts process the batch; the snapshot")
+    print("records the status changes as SCD2 history.")
 
 
 if __name__ == "__main__":

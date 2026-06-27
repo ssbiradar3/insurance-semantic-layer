@@ -1,0 +1,17 @@
+version: 2
+
+snapshots:
+  - name: policy_status_snapshot
+    description: >-
+      SCD2 history of policy status. One row per (policy, status-period) with
+      dbt_valid_from / dbt_valid_to bounding when each status was in effect.
+    columns:
+      - name: dbt_scd_id
+        description: "Surrogate key for the SCD2 record (one per status period)."
+        tests: [unique, not_null]
+      - name: policy_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['Active', 'Cancelled', 'Expired']
