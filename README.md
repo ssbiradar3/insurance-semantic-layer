@@ -9,7 +9,8 @@
 > **Trusted by design.** Every metric is reconciled to source and gated in CI —
 > if a number drifts from the system of record, the build fails. A metric is
 > trusted because it reconciles and passes the gate, not because of who authored
-> it. New here? Start with the [Project Overview](docs/PROJECT_OVERVIEW.md), or
+> it. New here? Start with the [Project Overview](docs/PROJECT_OVERVIEW.md), see
+> [how to test what a dashboard or an AI reports](docs/TESTING_AI_ANSWERS.md), or
 > launch the [interactive dashboard](#dashboard).
 
 A trusted, self-serve semantic layer for Property and Casualty insurance, built
@@ -197,6 +198,8 @@ docs/dashboard.png, then uncomment:
 
 - [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — a one-page,
   hiring-manager-friendly narrative (problem → solution → proof → impact).
+- [docs/TESTING_AI_ANSWERS.md](docs/TESTING_AI_ANSWERS.md) — how to test what a
+  dashboard or an AI reports: the semantic layer as the trust boundary.
 - [docs/PRODUCTION.md](docs/PRODUCTION.md) — how the **same project** runs inside
   a company: warehouse swap, the `seeds` → `sources` migration, environments,
   orchestration, CI, and governance.
