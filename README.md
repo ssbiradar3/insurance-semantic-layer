@@ -13,6 +13,8 @@
 > [how to test what a dashboard or an AI reports](docs/TESTING_AI_ANSWERS.md), or
 > launch the [interactive dashboard](#dashboard).
 
+![Insurance Semantic Layer — a self-serve dashboard whose every figure is queried live from the dbt + MetricFlow semantic layer](docs/dashboard.png)
+
 A trusted, self-serve semantic layer for Property and Casualty insurance, built
 on dbt and MetricFlow and running locally on DuckDB with zero warehouse cost.
 Synthetic policy, claim, and exposure data is enriched with a third-party vendor
@@ -187,12 +189,8 @@ bash scripts/dashboard.sh          # builds first if needed, then opens :8501
 
 It shows portfolio-wide loss / expense / **combined ratio** KPI cards, a combined-ratio
 breakdown by line of business or state (stacked into its loss + expense
-components), and claim frequency / severity — all sliceable from the sidebar.
-
-<!-- Add a screenshot for the portfolio: capture the running app and save it as
-docs/dashboard.png, then uncomment:
-![Dashboard](docs/dashboard.png)
--->
+components), and claim frequency / severity — all sliceable from the sidebar
+(pictured at the top of this README).
 
 ## Documentation
 
@@ -205,8 +203,6 @@ docs/dashboard.png, then uncomment:
   orchestration, CI, and governance.
 - [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md) — monitoring approach (volume
   anomalies, the `dbt docs` report) and the Elementary production path.
-- [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) — a film-ready demo-video script +
-  submission kit.
 
 ## Targeting Snowflake later
 
@@ -227,7 +223,7 @@ snapshots/            SCD2 policy-status history
 tests/                singular reconciliation / parity tests
 app/                  Streamlit dashboard (queries the semantic layer live)
 scripts/              data generator, refresh simulator, docs + validation gate
-docs/                 overview, production, observability, video script
+docs/                 overview, production, observability, testing-AI notes
 .claude/              Claude Code hook config
 .github/workflows/    CI + scheduled incremental refresh
 ```
