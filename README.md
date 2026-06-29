@@ -200,6 +200,23 @@ breakdown by line of business or state (stacked into its loss + expense
 components), and claim frequency / severity — all sliceable from the sidebar
 (pictured at the top of this README).
 
+### Deploy it to the web (Streamlit Community Cloud)
+
+The dashboard is deploy-ready, so a stakeholder can click a URL and explore it —
+no install. The app **self-bootstraps**: on first load it builds the dbt + DuckDB
+warehouse if it's missing, then serves. Steps:
+
+1. Repo is public on GitHub (done).
+2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub,
+   and **Create app → From existing repo**.
+3. Repo: this one · Branch: `main` · Main file: `app/streamlit_app.py`.
+4. **Advanced settings → Python 3.11** (dbt + MetricFlow need 3.11/3.12).
+5. **Deploy.** First load builds the warehouse once (~1–2 min); later loads are instant.
+
+The root `requirements.txt` installs the full stack. Note: Vercel / Netlify are
+*not* suitable — Streamlit needs a long-running server, not serverless functions.
+Hugging Face Spaces or Render work too if you want more memory.
+
 ## Documentation
 
 - [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — a one-page narrative

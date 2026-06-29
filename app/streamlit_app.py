@@ -62,6 +62,25 @@ def fmt_pct(x: float) -> str:
     return f"{x * 100:,.1f}%"
 
 
+@st.cache_resource(show_spinner="Building the semantic layer (first load only)…")
+def ensure_built() -> bool:
+    """On a fresh host (e.g. Streamlit Community Cloud) the DuckDB warehouse does
+    not exist yet. Build it once — install dbt packages, then seed + run so the
+    semantic layer is queryable. No-op locally once dev.duckdb exists."""
+    if (PROJECT_ROOT / "dev.duckdb").exists():
+        return True
+    env = {**os.environ, "DBT_PROFILES_DIR": str(PROJECT_ROOT)}
+
+    def run(cmd):
+        subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env, check=True,
+                       capture_output=True, text=True, timeout=600)
+
+    run(["dbt", "deps"])
+    run(["dbt", "seed", "--quiet"])
+    run(["dbt", "run", "--quiet"])  # models only — enough to serve the metrics
+    return True
+
+
 # --------------------------------------------------------------------------- #
 # Page
 # --------------------------------------------------------------------------- #
@@ -86,12 +105,14 @@ with st.sidebar:
     st.divider()
     st.caption("Source: `mf query` against the dbt + MetricFlow semantic layer.")
 
-# Guard: the warehouse must be built first.
+# Build the warehouse on first load if needed (fresh host), then query it.
 try:
+    ensure_built()
     overall = mf_query(tuple(COMPONENT_METRICS))
 except Exception as exc:  # noqa: BLE001
     st.error(
-        "Could not query the semantic layer. Build it first:\n\n"
+        "Could not build or query the semantic layer.\n\n"
+        "Locally, build it first:\n"
         "```\nsource .venv/bin/activate\nexport DBT_PROFILES_DIR=$(pwd)\n"
         "python scripts/generate_data.py && dbt build\n```\n\n"
         f"Details: `{exc}`"

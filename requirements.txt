@@ -1,0 +1,7 @@
+# Dependencies for hosting the dashboard (e.g. Streamlit Community Cloud).
+# The app self-bootstraps the dbt + DuckDB warehouse on first load, so the full
+# stack is needed at runtime, not just the UI libraries.
+streamlit>=1.30
+pandas>=2.0
+dbt-duckdb>=1.7
+dbt-metricflow>=0.6
