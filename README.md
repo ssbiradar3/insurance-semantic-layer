@@ -194,8 +194,8 @@ components), and claim frequency / severity — all sliceable from the sidebar
 
 ## Documentation
 
-- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — a one-page,
-  hiring-manager-friendly narrative (problem → solution → proof → impact).
+- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) — a one-page narrative
+  (problem → solution → proof → impact).
 - [docs/TESTING_AI_ANSWERS.md](docs/TESTING_AI_ANSWERS.md) — how to test what a
   dashboard or an AI reports: the semantic layer as the trust boundary.
 - [docs/PRODUCTION.md](docs/PRODUCTION.md) — how the **same project** runs inside

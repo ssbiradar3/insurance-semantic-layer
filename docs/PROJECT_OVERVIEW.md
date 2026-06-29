@@ -1,8 +1,7 @@
 # Insurance Semantic Layer — Project Overview
 
-> A one-page narrative for a hiring manager or portfolio reader. For the
-> production architecture and the local→company migration, see
-> [PRODUCTION.md](PRODUCTION.md).
+> A one-page narrative of the project. For the production architecture and the
+> local→company migration, see [PRODUCTION.md](PRODUCTION.md).
 
 ## TL;DR
 

@@ -141,6 +141,5 @@ Layer data-observability on top of the existing tests:
 - The reconciliation-to-source philosophy and the `assert_*` tests.
 - The trust rule and the CI gate.
 
-That portability is the whole point — and the reason this is a credible portfolio
-piece: it demonstrates the part of the job that *doesn't* change between a laptop
-and a Fortune-500 warehouse.
+That portability is the whole point: the modeling, metrics, and trust controls
+are the part that *doesn't* change between a laptop and a Fortune-500 warehouse.
