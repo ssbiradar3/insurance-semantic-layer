@@ -210,7 +210,11 @@ warehouse if it's missing, then serves. Steps:
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub,
    and **Create app → From existing repo**.
 3. Repo: this one · Branch: `main` · Main file: `app/streamlit_app.py`.
-4. **Advanced settings → Python 3.11** (dbt + MetricFlow need 3.11/3.12).
+4. **Advanced settings → Python 3.11 — this is required.** dbt does not run on
+   Python 3.13/3.14 (its `mashumaro` dependency fails to import), and the host may
+   default to a newer version. The repo also pins `.python-version` to `3.11`.
+   If the app was created on a newer Python, **delete it and recreate** choosing
+   3.11 — the interpreter is fixed at first deploy.
 5. **Deploy.** First load builds the warehouse once (~1–2 min); later loads are instant.
 
 The root `requirements.txt` installs the full stack. Note: Vercel / Netlify are
