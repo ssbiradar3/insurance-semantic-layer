@@ -1,19 +1,24 @@
 # Insurance Semantic Layer (dbt + MetricFlow)
 
+[![Live demo](https://img.shields.io/badge/▶_Live_demo-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://insurance-semantic-layer.streamlit.app/)
 [![dbt-ci](https://github.com/ssbiradar3/insurance-semantic-layer/actions/workflows/ci.yml/badge.svg)](https://github.com/ssbiradar3/insurance-semantic-layer/actions/workflows/ci.yml)
 ![dbt](https://img.shields.io/badge/dbt-Core-FF694B?logo=dbt&logoColor=white)
 ![MetricFlow](https://img.shields.io/badge/MetricFlow-semantic_layer-262A38)
 ![DuckDB](https://img.shields.io/badge/DuckDB-local-FFF000?logo=duckdb&logoColor=black)
 ![Snowflake-ready](https://img.shields.io/badge/Snowflake-ready-29B5E8?logo=snowflake&logoColor=white)
 
+> **▶ Try the live dashboard:** **https://insurance-semantic-layer.streamlit.app/**
+> — self-serve, every figure queried live from the semantic layer. (Hosted free;
+> give it ~1 minute to wake on first load.)
+
 > **Trusted by design.** Every metric is reconciled to source and gated in CI —
 > if a number drifts from the system of record, the build fails. A metric is
 > trusted because it reconciles and passes the gate, not because of who authored
 > it. New here? Start with the [Project Overview](docs/PROJECT_OVERVIEW.md), see
 > [how to test what a dashboard or an AI reports](docs/TESTING_AI_ANSWERS.md), or
-> launch the [interactive dashboard](#dashboard).
+> open the [live dashboard](https://insurance-semantic-layer.streamlit.app/).
 
-![Insurance Semantic Layer — a self-serve dashboard whose every figure is queried live from the dbt + MetricFlow semantic layer](docs/dashboard.png)
+[![Insurance Semantic Layer dashboard — every figure queried live from the dbt + MetricFlow semantic layer](docs/dashboard.png)](https://insurance-semantic-layer.streamlit.app/)
 
 A trusted, self-serve semantic layer for Property and Casualty insurance, built
 on dbt and MetricFlow and running locally on DuckDB with zero warehouse cost.
@@ -183,6 +188,8 @@ mf query --metrics loss_ratio,claim_frequency --group-by policy__line_of_busines
 ```
 
 ## Dashboard
+
+**▶ Live: https://insurance-semantic-layer.streamlit.app/** — no install, just click.
 
 An interactive Streamlit dashboard where **every figure is queried live from the
 MetricFlow semantic layer** (via `mf query`) — not re-derived in the app. It's the

@@ -1,7 +1,8 @@
 # Insurance Semantic Layer — Project Overview
 
-> A one-page narrative of the project. For the production architecture and the
-> local→company migration, see [PRODUCTION.md](PRODUCTION.md).
+> A one-page narrative of the project. **Live demo:**
+> https://insurance-semantic-layer.streamlit.app/ . For the production architecture
+> and the local→company migration, see [PRODUCTION.md](PRODUCTION.md).
 
 ## TL;DR
 
