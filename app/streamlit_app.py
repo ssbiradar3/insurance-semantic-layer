@@ -15,6 +15,7 @@ Run:
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -22,7 +23,29 @@ import pandas as pd
 import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-MF_BIN = shutil.which("mf") or "mf"
+
+# On hosts like Streamlit Community Cloud the dbt/mf console scripts are installed
+# next to the running Python but are not always on the subprocess PATH (which shows
+# up as "No such file or directory: 'dbt'"). Resolve them by absolute path, and put
+# that bin dir on PATH for anything dbt/mf themselves spawn.
+BIN_DIR = Path(sys.executable).parent
+
+
+def _bin(name: str) -> str:
+    cand = BIN_DIR / name
+    return str(cand) if cand.exists() else (shutil.which(name) or name)
+
+
+DBT_BIN = _bin("dbt")
+MF_BIN = _bin("mf")
+
+
+def _env() -> dict:
+    return {
+        **os.environ,
+        "DBT_PROFILES_DIR": str(PROJECT_ROOT),
+        "PATH": f"{BIN_DIR}{os.pathsep}{os.environ.get('PATH', '')}",
+    }
 
 # Dimensions a stakeholder can slice by (entity-qualified, per the project conventions).
 DIMENSIONS = {
@@ -45,9 +68,8 @@ def mf_query(metrics: tuple[str, ...], group_by: str | None = None) -> pd.DataFr
     if group_by:
         cmd += ["--group-by", group_by]
 
-    env = {**os.environ, "DBT_PROFILES_DIR": str(PROJECT_ROOT)}
     proc = subprocess.run(
-        cmd, cwd=str(PROJECT_ROOT), env=env,
+        cmd, cwd=str(PROJECT_ROOT), env=_env(),
         capture_output=True, text=True, timeout=120,
     )
     if proc.returncode != 0:
@@ -69,15 +91,16 @@ def ensure_built() -> bool:
     semantic layer is queryable. No-op locally once dev.duckdb exists."""
     if (PROJECT_ROOT / "dev.duckdb").exists():
         return True
-    env = {**os.environ, "DBT_PROFILES_DIR": str(PROJECT_ROOT)}
 
     def run(cmd):
-        subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env, check=True,
-                       capture_output=True, text=True, timeout=600)
+        p = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=_env(),
+                           capture_output=True, text=True, timeout=600)
+        if p.returncode != 0:
+            raise RuntimeError(f"`{' '.join(cmd)}` failed:\n{p.stderr or p.stdout}")
 
-    run(["dbt", "deps"])
-    run(["dbt", "seed", "--quiet"])
-    run(["dbt", "run", "--quiet"])  # models only — enough to serve the metrics
+    run([DBT_BIN, "deps"])
+    run([DBT_BIN, "seed", "--quiet"])
+    run([DBT_BIN, "run", "--quiet"])  # models only — enough to serve the metrics
     return True
 
 
