@@ -78,10 +78,10 @@ mf query --metrics loss_ratio,expense_ratio,combined_ratio \
 
 ```
 line_of_business    loss_ratio   expense_ratio   combined_ratio
-Property               2.52033            0.28          2.80033
-Casualty               2.59643            0.30          2.89643
-Marine                 2.08353            0.26          2.34353
-Cyber                  3.36258            0.34          3.70258
+Marine                 0.52041            0.26          0.78041   # underwriting profit
+Property               0.62859            0.28          0.90859
+Casualty               0.64859            0.30          0.94859
+Cyber                  0.83874            0.34          1.17873   # underwriting loss
 ```
 
 > A subtle bug I caught: my first expense reconciliation test re-derived the rate
@@ -133,21 +133,21 @@ question (**analytics**).
 
 ## An analyst's read (analyst lens)
 
-Querying the layer (synthetic data — read the *relative* story, not the absolute
-levels, which are deliberately loss-heavy):
+Querying the layer (synthetic data, tuned to realistic P&C levels):
 
-- **Marine is the most profitable book** (combined ratio 2.34) — it has the
-  *lowest* claim frequency (0.56) and the *lowest* expense load (26%).
-- **Cyber is the worst** (3.70) — a *double* problem: the highest loss ratio
-  (3.36) **and** the highest expense load (34%). Expense discipline alone won't
-  fix it; it's a loss-cost issue.
-- **Property** carries the highest claim **frequency** (0.77) and **severity**
-  (~138k) — frequency and severity are both elevated, a classic cat-exposed book.
-- **Geography:** California is the most profitable state (2.08); Colorado and
-  Florida are the weakest (3.92 / 3.69) — consistent with catastrophe exposure.
+- **Marine is the most profitable book** — a 78% combined ratio (0.78), driven by
+  the *lowest* claim frequency (0.56) and the *lowest* expense load (26%).
+- **Cyber is the only unprofitable book** — a **118% combined ratio (1.18), an
+  underwriting loss**: the highest loss ratio (0.84) *and* the highest expense
+  load (34%). A double problem — expense discipline alone won't fix it.
+- **Property** still runs profitably (91%) despite the highest claim **frequency**
+  (0.77) and **severity** (~34.5k) — a high-volume book that's priced for it.
+- **Geography:** California is the most profitable state (74%); Colorado (120%),
+  Florida (114%), and Washington (104%) run at **underwriting losses** —
+  consistent with catastrophe exposure.
 - **So what:** the combined-ratio decomposition points underwriting at *Cyber
-  loss cost* and *CO/FL cat exposure* first — that's the action the metric layer
-  is built to enable.
+  loss cost* and the *CO / FL / WA cat-exposed book* first — exactly the action
+  the metric layer exists to enable.
 
 ## Tech stack
 

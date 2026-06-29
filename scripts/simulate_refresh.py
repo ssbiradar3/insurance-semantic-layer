@@ -112,7 +112,7 @@ def main():
             for _ in range(random.randint(1, 2)):
                 loss = eff + timedelta(days=random.randint(5, 300))
                 report = loss + timedelta(days=random.randint(0, 30))
-                paid = round(random.uniform(500, 200_000), 2)
+                paid = round(random.uniform(500, 62_000), 2)   # realistic severity (see generate_data.py)
                 reserve = round(paid * random.uniform(0.0, 0.6), 2)
                 cstatus = random.choices(["Closed", "Open"], weights=[75, 25])[0]
                 if cstatus == "Closed":

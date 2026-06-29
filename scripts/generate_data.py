@@ -139,7 +139,11 @@ for pol in policies:
         for _ in range(random.randint(1, 3)):
             loss = eff + timedelta(days=random.randint(5, 360))
             report = loss + timedelta(days=random.randint(0, 45))
-            paid = round(random.uniform(500, 250_000), 2)
+            # Severity is tuned so the portfolio loss ratio lands in a realistic
+            # P&C band (~65%), giving a combined ratio near 95% (slim underwriting
+            # profit). Only the amount changes — claim counts/frequency are
+            # unchanged, so reconciliation is unaffected.
+            paid = round(random.uniform(500, 62_000), 2)
             reserve = round(paid * random.uniform(0.0, 0.6), 2)
             cstatus = random.choices(["Closed", "Open"], weights=[75, 25])[0]
             if cstatus == "Closed":

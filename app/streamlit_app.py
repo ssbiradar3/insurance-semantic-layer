@@ -109,7 +109,9 @@ c2.metric("Expense ratio", fmt_pct(expense))
 c3.metric(
     "Combined ratio",
     fmt_pct(combined),
-    delta="underwriting loss" if combined > 1 else "underwriting profit",
+    # Points above/below the 100% breakeven line. delta_color="inverse" so below
+    # breakeven (an underwriting profit) shows green, above it shows red.
+    delta=f"{(combined - 1) * 100:+.1f} pts vs. breakeven",
     delta_color="inverse",
 )
 

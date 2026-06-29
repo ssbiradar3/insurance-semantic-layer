@@ -1,0 +1,7 @@
+# Cleaner UI for a stakeholder-facing dashboard: hide the developer toolbar
+# (Deploy button / menu) and pin a light theme.
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "light"
