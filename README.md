@@ -107,6 +107,14 @@ and MetricFlow builds the join automatically through the shared `policy` entity.
 A metric is trusted because it reconciles and passes the gate, not because of who
 or what authored it.
 
+Because these gold numbers feed downstream systems (EDW, Oracle GL, ceded
+reinsurance) and roll up into externally-reported financial results, the
+reconciliation tests are **source-to-target reconciliation expressed as code** —
+the control that keeps a wrong figure out of a financial report, run on every
+build instead of as a manual spreadsheet tie-out. See
+[docs/SOURCE_TO_TARGET.md](docs/SOURCE_TO_TARGET.md) for the mapping of each
+governed number to its source and its reconciliation control.
+
 ## Data quality checks
 
 Tests run at every layer and all execute in `dbt build` / CI:
@@ -198,6 +206,9 @@ components), and claim frequency / severity — all sliceable from the sidebar
   (problem → solution → proof → impact).
 - [docs/TESTING_AI_ANSWERS.md](docs/TESTING_AI_ANSWERS.md) — how to test what a
   dashboard or an AI reports: the semantic layer as the trust boundary.
+- [docs/SOURCE_TO_TARGET.md](docs/SOURCE_TO_TARGET.md) — source-to-target mapping
+  (STM) for each governed number, with the reconciliation control that proves it
+  ties back to source (the control you'd put on a GL / financial feed).
 - [docs/PRODUCTION.md](docs/PRODUCTION.md) — how the **same project** runs inside
   a company: warehouse swap, the `seeds` → `sources` migration, environments,
   orchestration, CI, and governance.
