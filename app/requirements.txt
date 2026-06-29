@@ -1,3 +1,0 @@
-# Dashboard dependencies (the dbt/MetricFlow stack is installed separately).
-streamlit>=1.30
-pandas>=2.0

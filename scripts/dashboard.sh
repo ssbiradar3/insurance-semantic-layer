@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Launch the interactive dashboard. Assumes the warehouse is already built
 # (run `bash scripts/validate.sh` or `dbt build` first) and streamlit installed
-# (`pip install -r app/requirements.txt`).
+# (`pip install -r requirements.txt`).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 export DBT_PROFILES_DIR="${DBT_PROFILES_DIR:-$(pwd)}"

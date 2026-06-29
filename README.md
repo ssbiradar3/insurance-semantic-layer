@@ -190,7 +190,7 @@ MetricFlow semantic layer** (via `mf query`) — not re-derived in the app. It's
 for a stakeholder.
 
 ```bash
-pip install -r app/requirements.txt
+pip install -r requirements.txt
 bash scripts/dashboard.sh          # builds first if needed, then opens :8501
 # or: streamlit run app/streamlit_app.py   (with DBT_PROFILES_DIR set)
 ```
